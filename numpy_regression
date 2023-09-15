@@ -1,0 +1,48 @@
+from numpy import *
+import matplotlib.pyplot as plt
+import sys
+from numpy import linspace
+
+def powers(numbers, start, end):
+    result = []
+    for num in numbers:
+        row = []
+        for power in range (start, end+1):
+            row.append(num**power)
+        result.append(row)
+    return array(result)
+
+def poly(a,x):
+    res = 0
+    for i in range(len(a)):
+        if i == 0:
+            res += a[i]
+        else: 
+            res += a[i] * pow(x, i)
+    return res
+
+
+def regressionmodel():
+    data = transpose(loadtxt(sys.argv[1]))
+    X = data[0]
+    Y = data[1]
+    n = int(sys.argv[2])
+    Xp  = powers(X,0,n)
+    Yp  = powers(Y,1,1)
+    Xpt = Xp.transpose()
+    a = matmul(linalg.inv(matmul(Xpt,Xp)),matmul(Xpt,Yp))
+    a = a[:,0]
+    X2 = linspace(min(X), max(X), 50).tolist()
+    Y2 = []
+    for i in range(len(X2)):
+        Y2.append(poly(a, X2[i]))
+
+    plt.plot(X, Y, 'ro', label="Plotted Data")
+    plt.plot(X2, Y2, label="Fitted line")
+    plt.title("Regression model")
+    plt.xlabel("Temperature (Celcius)")
+    plt.ylabel("Chirps per minute")
+    plt.legend()
+    plt.show()
+
+regressionmodel()
