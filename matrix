@@ -1,0 +1,73 @@
+def transpose(matrix):
+    if matrix == []:
+        return []
+    
+    lengd_rows = len(matrix)
+    lengd_cols = len(matrix[0])
+
+    transposed = [[0] * lengd_rows for _ in range(lengd_cols)]
+
+    for i in range(lengd_rows):
+        for j in range(lengd_cols):
+            transposed[j][i] = matrix[i][j]
+    return transposed
+
+def powers(numbers, start, end):
+    result = []
+    for num in numbers:
+        row = []
+        for power in range (start, end+1):
+            row.append(num**power)
+        result.append(row)
+    return result
+
+def matmul(matrix_a, matrix_b):
+    if matrix_a == [] or matrix_b == []:
+        return []
+
+    rows_a = len(matrix_a)
+    columns_a = len(matrix_a[0])
+    rows_b = len(matrix_b)
+    columns_b = len(matrix_b[0])
+
+    
+    if columns_a != rows_b:
+        raise ValueError("Matrices can't be multiplied")
+    
+    matrix_c = []
+    for _ in range(rows_a):
+        row = [0] * columns_b
+        matrix_c.append(row)
+
+    for i in range(rows_a):
+        for j in range(columns_b):
+            for k in range(len(matrix_b)):
+                matrix_c[i][j] += matrix_a[i][k] * matrix_b[k][j]
+    return matrix_c
+
+
+def invert(matrix):
+    rows = len(matrix)
+    columns = len(matrix[0])
+
+    if rows != 2 or columns != 2: 
+        raise ValueError("Matrix must be a 2x2 matrix")
+    #calculate the determinant
+    a, b = matrix[0]
+    c, d = matrix[1]
+    det = a * d - b * c
+
+    if det == 0:
+        raise ValueError("Matrix can't be inverted")
+    
+    inverted_matrix = [[d/det, -b/det], [-c/det, a/det]]
+    return inverted_matrix
+
+def loadtxt(filename):
+    matrix = []
+    with open(filename, 'r') as file:
+        for line in file:
+            numbers = line.strip().split('\t') 
+            row = [float(num) for num in numbers]
+            matrix.append(row)
+    return matrix
