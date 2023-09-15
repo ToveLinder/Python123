@@ -1,0 +1,26 @@
+from matrix import *
+import matplotlib.pyplot as plt
+import sys
+
+def main():
+    data = transpose(loadtxt(sys.argv[1]))
+    X = data[0]
+    Y = data[1]
+#from the data the program should compute the lrm formula:
+    Xp  = powers(X,0,1)
+    Yp  = powers(Y,1,1)
+    Xpt = transpose(Xp)
+    [[b],[m]] = matmul(invert(matmul(Xpt,Xp)),matmul(Xpt, Yp))
+    #pred y = b + m * temperature
+    Y2 = [b + m * x for x in X]
+
+
+    plt.plot(X, Y, 'ro', label="Plotted Data")
+    plt.plot(X, Y2, label="Fitted line")
+    plt.title("Regression model")
+    plt.xlabel("Temperature (Celcius)")
+    plt.ylabel("Chirps per minute")
+    plt.legend()
+    plt.show()
+
+main()
