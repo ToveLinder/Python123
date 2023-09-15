@@ -1,0 +1,134 @@
+import math
+
+class Ratio:
+    def __init__(self, nom, denom):
+        divisor = math.gcd(nom, denom)
+        self.nom = nom // divisor
+        self.denom = denom // divisor
+
+    def __repr__(self):
+        s = "Ratio("+str(self.nom)+","+str(self.denom)+")"
+        return s
+        
+    def __add__(self, other):
+        new_nom = self.nom * other.denom + other.nom * self.denom
+        new_denom = self.denom * other.denom
+        return Ratio(new_nom, new_denom)
+
+    def __mul__(self, other):
+        new_nom = self.nom * other.nom
+        new_denom = self.denom * other.denom
+        return Ratio(new_nom, new_denom)
+
+    def __eq__(self, other):
+        res = self.nom == other.nom and self.denom == other.denom
+        return res
+
+########
+
+
+def logmap(r,x) :
+    return r*x*(1-x)
+
+r_val = eval(input("Enter a value for r: "))
+x_val = eval(input("Enter a value for x: "))
+
+result = logmap(r_val, x_val)
+print("Result:", result)
+
+def experiment(r,x,n):
+    values = [x]
+    print("this program illustrates the logistic map")
+    for i in range(n):
+        x = logmap(r,x)
+        values.append(x)
+    return values
+
+r_val = eval(input("Enter a value for r in the range 0 to 4: "))
+x_val = eval(input("Enter a number for x between 0 and 1: "))
+n_val = eval(input("Enter a value n for how many vlaues you want: "))
+
+listofvalues = experiment(r_val, x_val, n_val)
+print("List of values equals:", listofvalues)
+
+
+def table(r, x1, x2,n):
+    print("This program illustrates the logistic map")
+    r = eval(input("Enter a value for r in the range 0 to 4: "))
+    x1 = eval(input("Enter a number between 0 and 1 (for column 1): "))
+    x2 = eval(input("Enter a number between 0 and 1 (for column 2): "))
+    n = eval(input("Enter a value n for how many vlaues you want: "))
+    print('{:<8}'.format("input") + '{:^12}'.format(x1) + '{:>12}'.format(x2))
+    print("---------------------------")
+    for i in range(n):
+        pass
+
+#####
+
+  #BINARY SEARCH 
+def binarySearch(values, i, j, key):
+    if i > j:
+        return None
+  
+    k = (i + j) // 2
+    item = values[k]
+  
+    if item == key:
+        return k
+    elif key < item:
+        return binarySearch(values, i, k - 1, key)
+    else: 
+        return binarySearch(values, k + 1, j, key)
+
+
+####
+#CARDS
+
+class Card:
+  def __init__(self, rank, suit):
+    self.rank = rank
+    self.suit = suit
+  
+  def getRank(self):
+    return self.rank
+  
+  def getSuit(self): 
+    return self.suit
+  
+  def value(self): 
+    if self.rank < 10:
+      return self.rank
+    else:
+      return 10
+  
+  def __str__(self):
+    self.rank_names = {1: "Ace", 11: "Jack", 12: "Queen", 13: "King"}
+    self.suit_names = {'d': "Diamonds", 'c': "Clubs", 'h': "Hearts", 's': "Spades"}
+    return self.rank_names[self.rank]+ " of " + self.suit_names[self.suit]
+
+
+###
+
+ class DiceStats:
+    def __init__(self):
+        self.freq_each_outcome = [0, 0, 0, 0, 0, 0]
+        self.total_rolls = 0
+
+    def addRoll(self, roll):
+        self.freq_each_outcome[roll - 1] += 1
+        self.total_rolls += 1
+
+    def getFrequencies(self):
+        frequencies = [count / self.total_rolls for count in self.freq_each_outcome]
+        return frequencies
+
+    def isFair(self, epsilon):
+        frequencies = self.getFrequencies()
+        expected_frequency = 1 / 6
+        
+        for frequency in frequencies:
+            if abs(frequency - expected_frequency) > epsilon:
+                return False
+        return True
+
+
