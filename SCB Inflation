@@ -1,4 +1,97 @@
+#Inflation HICP monthly data (PRC_HICP_MMOR) from eurostat, monthly change in inflation, dowloading, managing and plotting data program. Interactive
+import pandas as pd
+import matplotlib.pyplot as plt
+import eurostat
 
+# LOAD DATA
+dataset_code = "PRC_HICP_MMOR"
+data = eurostat.get_data_df(dataset_code)
+data.to_csv("HICP_monthly_data.csv", index=False)
+df = pd.read_csv('HICP_monthly_data.csv', sep=',')
+
+#MANAGE DATA
+df.rename(columns={'geo\\TIME_PERIOD': 'Country'}, inplace=True)
+eu_country_acronyms = ['BE', 'EL', 'MT', 'SI', 'BG', 'IE', 'NL', 'ES', 'CY', 'IT', 'AT', 'DK', 'HR', 'PL', 'SE', 'EE', 'LV', 'PT', 'CZ', 'FI', 'LT', 'RO', 'DE', 'FR', 'LU', 'SK', 'HU']
+df = df[df['Country'].str[:3].isin(eu_country_acronyms)]
+country_mapping = {
+    'BE': 'Belgium',
+    'EL': 'Greece',
+    'MT': 'Malta',
+    'SI': 'Slovenia',
+    'BG': 'Bulgaria',
+    'IE': 'Ireland',
+    'NL': 'Netherlands',
+    'ES': 'Spain',
+    'CY': 'Cyprus',
+    'IT': 'Italy',
+    'AT': 'Austria',
+    'DK': 'Denmark',
+    'HR': 'Croatia',
+    'PL': 'Poland',
+    'SE': 'Sweden',
+    'EE': 'Estonia',
+    'LV': 'Latvia',
+    'PT': 'Portugal',
+    'CZ': 'Czech Republic',
+    'FI': 'Finland',
+    'LT': 'Lithuania',
+    'RO': 'Romania',
+    'DE': 'Germany',
+    'FR': 'France',
+    'LU': 'Luxembourg',
+    'SK': 'Slovakia',
+    'HU': 'Hungary'
+}
+df['Country'] = df['Country'].replace(country_mapping)
+columns_to_remove = ['freq', 'unit']
+df.drop(columns=columns_to_remove, inplace=True)
+pivot_df = df.pivot_table(index=['Country', 'coicop'], aggfunc='first').reset_index()
+pivot_df = pivot_df.melt(id_vars=['Country', 'coicop'], var_name='Month and Year', value_name='Value')
+pivot_df[['Year', 'Month']] = pivot_df['Month and Year'].str.split('-', n=1, expand=True)
+pivot_df.drop(columns=['Month and Year'], inplace=True)
+pivot_df['Month'] = pd.to_datetime(pivot_df['Month'], format='%m').dt.strftime('%b')
+
+#USER INPUT
+print("List to choose from:")
+for country in pivot_df['Country'].unique():
+    print(country)
+country_input = input("Enter the country (e.g. Sweden): ")
+print("\nList to choose from:")
+for coicop in pivot_df['coicop'].unique():
+    print(coicop)
+inflation_input = input("Choose Classification of individual consumption by purpose (COICOP) (e.g. CP00): ")
+print("\nList to choose from:")
+for year in pivot_df['Year'].unique():
+     print(year)
+year_input = input("Enter the year (e.g. 2022): ")
+
+# CREATE AND PLOT THE SAMPLE DF:
+sample_df = pivot_df[(pivot_df['Year'] == year_input) & (pivot_df['Country'] == country_input) & (pivot_df['coicop'] == inflation_input)].copy()
+sample_df.reset_index(drop=True, inplace=True)
+if sample_df.empty:
+    print("No data found for the specified country, COICOP, and year.")
+if sample_df.isnull().values.any():
+    print("Missing values in chosen sample")
+else:
+    plt.figure(figsize=(12, 10))
+    plt.plot(sample_df['Month'], sample_df['Value'], marker='o', linestyle='-', label=f'{country_input} ({inflation_input}) - {year_input}')
+    plt.xlabel('Month')
+    plt.ylabel('HICP - Monthly rate of change')
+    plt.title(f'HICP (monthly rate of change) ({inflation_input}) in {country_input} for {year_input}')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+
+
+
+
+
+#Another program, that imports inflation data for Sweden only, using SCB data. 
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
